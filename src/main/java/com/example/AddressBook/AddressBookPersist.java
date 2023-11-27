@@ -6,22 +6,32 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AddressBookPersist {
 
-    private List<AddressBook> addressBooks;
+    private AddressBook addressBook;
+    private List<AddressBook> addressBooks = new ArrayList<AddressBook>();
 
     public AddressBookPersist() {
-        addressBooks = new ArrayList<AddressBook>();
-        addressBooks = readAddressBooks(); // reads from previous runs      
+        addressBook = new AddressBook();
+        addressBook = readAddressBooks(); // reads from previous runs      
     }
 
     public void addAddressBook(AddressBook addressbook) {
         if(!addressBooks.contains(addressbook)){
             addressBooks.add(addressbook);
-            storeAddressBooks(addressBooks);
+            storeAddressBooks(addressbook);
         }
 
     }
@@ -29,7 +39,7 @@ public class AddressBookPersist {
     public void removeAddressBook(AddressBook addressbook) {
         if(addressBooks.contains(addressbook)){
             addressBooks.remove(addressbook);
-            storeAddressBooks(addressBooks);
+            storeAddressBooks(addressbook);
         }
 
     }
@@ -38,51 +48,88 @@ public class AddressBookPersist {
         return addressBooks;
     }
 
-    public void setAddressBooks(List<AddressBook> addressBooks) {
-        this.addressBooks = addressBooks;
-        storeAddressBooks(addressBooks);
+//    public void setAddressBooks(List<AddressBook> addressBooks) {
+//        this.addressBooks = addressBooks;
+//        storeAddressBooks(addressBooks);
+//
+//    }   
+//
+//    public void removeAllAddressBooks(){
+//        addressBooks.clear();
+//        storeAddressBooks(addressBooks);
+//
+//    }   
 
-    }   
+    public void storeAddressBooks(AddressBook addressBook) {
 
-    public void removeAllAddressBooks(){
-        addressBooks.clear();
-        storeAddressBooks(addressBooks);
-
-    }   
-
-    public void storeAddressBooks(List<AddressBook> addressBooks) {
-        try {
-        	for(AddressBook addressBook:addressBooks)
-        	{
-        	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/main/resources/abc.dat"));
-            oos.writeObject(addressBook);
-            oos.close();
-        } }catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public List<AddressBook> readAddressBooks() {
-        List<AddressBook> addressBooks = new ArrayList<AddressBook>();
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
-                    "src/main/resources/abc.dat"));
-            if(ois.readObject() != null){
-                addressBooks = (List<AddressBook>) ois.readObject();
+        Path filePath = Paths.get("src/main/resources/abc.txt");
+        List<Contact> contactList=null;
+        try  {
+            contactList=addressBook.getFriends();
+            for(int i=0;i<contactList.size();i++) {
+                Files.writeString(filePath, contactList.get(i).getName()+ "\n", StandardOpenOption.APPEND);
+                Files.writeString(filePath, contactList.get(i).getPhoneNumber()+ "\n", StandardOpenOption.APPEND);
             }
-            ois.close();
-        } catch (EOFException ex) {
+            // Write the friend list to the file
+            System.out.println("Address book saved to " + filePath);
 
-        	System.out.println("");
-        }catch (FileNotFoundException ex) {
-            System.out.println("No address books stored");
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return addressBooks;
+    
     }
+    
+    public static AddressBook readAddressBookFromFile(String filePath) {
+        AddressBook addressBook=new AddressBook();
+        ArrayList<Contact> contactList=new ArrayList<>();
+        try  {
+            String text=Files.readString(Path.of(filePath)).strip();
+            String[] input=text.split("\n");
+            for(int i=0;i<input.length;i=i+2){
+                for(int j=i;j<=i+1;j++){
+                    Contact c=new Contact(input[j].trim(),input[j+1].trim());
+                    contactList.add(c);
+                    break;
+                }
+            }
+            addressBook.setFriends(contactList);
+            // Write the friend list to the file
+            System.out.println("Address read successfully");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return addressBook;
+    }
+
+    public AddressBook readAddressBooks() {
+    	 AddressBook addressBook=new AddressBook();
+         ArrayList<Contact> contactList=new ArrayList<>();
+         try  {
+             String text=Files.readString(Path.of("src/main/resources/abc.txt")).strip();
+             if(!text.isEmpty())
+             {
+             String[] input=text.split("\n");
+             for(int i=0;i<input.length;i=i+2){
+                 for(int j=i;j<=i+1;j++){
+                     Contact c=new Contact(input[j].trim(),input[j+1].trim());
+                     contactList.add(c);
+                     break;
+                 }
+             }
+             addressBook.setFriends(contactList);
+             // Write the friend list to the file
+             System.out.println("Address read successfully");
+             }
+
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+         return addressBook;
+    	
+}
+		
+		
+    
 }
     
-
