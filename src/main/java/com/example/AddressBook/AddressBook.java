@@ -21,11 +21,9 @@ import java.util.stream.Stream;
 public class AddressBook implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String FILE_NAME = "src/main/resources/AAA.txt";
-
-
+    
     private String addressBookName;
-    private ArrayList<Contact> friends = new ArrayList<>();
+    private ArrayList<Contact> contacts = new ArrayList<>();
 
 
     public AddressBook(String name) {
@@ -34,12 +32,12 @@ public class AddressBook implements Serializable {
 
     public AddressBook(String addressBookName, ArrayList<Contact> phonebook) {
         super();
-        this.friends = phonebook;
+        this.contacts = phonebook;
         this.addressBookName = addressBookName;
     }
 
     public AddressBook() {
-        this.friends = new ArrayList<>();
+        this.contacts = new ArrayList<>();
     }
 
     public String getAddressBookName() {
@@ -50,36 +48,36 @@ public class AddressBook implements Serializable {
         this.addressBookName = addressBookName;
     }
 
-    public ArrayList<Contact> getFriends() {
-        return friends;
+    public ArrayList<Contact> getContacts() {
+        return contacts;
     }
 
-    public void setFriends(ArrayList<Contact> friends) {
-        this.friends = friends;
+    public void setContacts(ArrayList<Contact> contacts) {
+        this.contacts = contacts;
     }
 
     @Override
     public String toString() {
-        return "AddressBook [addressBookName=" + addressBookName + ", phonebook=" + friends + "]";
+        return "AddressBook [addressBookName=" + addressBookName + ", phonebook=" + contacts + "]";
     }
 
 
-    public void addFriend(String name, String phoneNumber) {
-        Contact friend = new Contact(name, phoneNumber);
-        friends.add(friend);
+    public void addContact(String name, String phoneNumber) {
+        Contact contact = new Contact(name, phoneNumber);
+        contacts.add(contact);
     }
     
-    public void addFriend(Contact c) {
-        friends.add(c);
+    public void addContact(Contact c) {
+        contacts.add(c);
     }
 
-    public void displayFriendsSortedByName() {
-        // Sort friends by name
-        Collections.sort(friends, Comparator.comparing(Contact::getName));
+    public void displayContactsSortedByName() {
+        // Sort contacts by name
+        Collections.sort(contacts, Comparator.comparing(Contact::getName));
 
         // Display the sorted list
-        for (Contact friend : friends) {
-            System.out.println("Name: " + friend.getName() + ", Phone: " + friend.getPhoneNumber());
+        for (Contact contact : contacts) {
+            System.out.println("Name: " + contact.getName() + ", Phone: " + contact.getPhoneNumber());
         }
     }
    
